@@ -1,0 +1,6 @@
+verbose = true
+port = 27017
+dbpath = e:\data\db\
+noauth = true
+maxConns = 10
+rest = true
