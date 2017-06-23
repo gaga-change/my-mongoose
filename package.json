@@ -1,0 +1,14 @@
+{
+  "name": "my-mongoose",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mongoose": "^4.10.8"
+  }
+}
