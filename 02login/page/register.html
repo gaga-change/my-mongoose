@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+  <meta charset="UTF-8">
+  <title>注册</title>
+  <script src="/static/lib/jquery.js"></script>
+</head>
+<body>
+<div>
+  <ul>
+    <li><a href="/">主页</a></li>
+    <li><a href="/login.html">登入</a></li>
+    <li><a href="/logout.html">退出</a></li>
+    <li><a href="/register.html">注册</a></li>
+  </ul>
+</div>
+<div>
+  <input type="text" id="username"> 用户名
+  <input type="text" id="password"> 密码
+</div>
+<div>
+  <button type="button" id="commit">注册</button>
+</div>
+<script>
+  $('#commit').click(function () {
+    var username = $('#username')
+    var password = $('#password')
+    console.log(username.val())
+    console.log(password.val())
+    $.post('/api/register', {username: username.val(), password: password.val()}, function (res) {
+      console.log(res)
+      if (res.success) {
+        alert('注册成功')
+        location.href = '/'
+      } else {
+        alert(res.message)
+      }
+    })
+  })
+</script>
+</body>
+</html>
