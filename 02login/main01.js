@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo')(session)
+const User = require('./models/user_schema')
 
 mongoose.Promise = global.Promise
 let app = express()
@@ -35,7 +36,7 @@ app.use(session({
 /* 每个请求，获取当前登入的账号，并赋值到req */
 app.use('/', function (req, res, next) {
   if (req.session.accountId) {
-    Account.findOne({_id: req.session.accountId}, function (err, account) {
+    User.findOne({_id: req.session.accountId}, function (err, account) {
       if (err) {
         res.send({success: false, message: err.toString()})
       } else if (account) {
@@ -60,12 +61,6 @@ app.get('*', function (req, res) {
   res.send(404)
 })
 
-const Account = mongoose.model('Account', {
-  username: String,
-  password: String,
-  createTime: {type: Date, default: Date.now}
-})
-
 /* 获取当前登入的用户 */
 function getAccount(req, res) {
   if (req.account) {
@@ -79,12 +74,12 @@ function getAccount(req, res) {
 function login(req, res) {
   let username = req.body.username || ''
   let password = req.body.password || ''
-  Account.findOne({username}, function (err, account) {
+  User.findOne({username}, function (err, account) {
     if (err) {
       res.send({success: false, message: err.toString()})
     } else if (!account) {
       res.send({success: false, message: '用户名不存在'})
-    } else if (account.password !== password) {
+    } else if (!account.authenticate(password)) {
       res.send({success: false, message: '密码错误'})
     } else {
       req.session.accountId = account.id
@@ -103,13 +98,13 @@ function logout(req, res) {
 function register(req, res) {
   let username = req.body.username || ''
   let password = req.body.password || ''
-  Account.findOne({username}, function (err, person) {
+  User.findOne({username}, function (err, person) {
     if (err) {
       res.send({success: false, message: err.toString()})
     } else if (person) { // 用户已存在
       res.send({success: false, message: '用户名已存在'})
     } else { // 存储用户
-      let account = new Account({username, password})
+      let account = new User({username, password})
       account.save(function (err, account) {
         if (err) {
           res.send({success: false, message: err.toString()})
