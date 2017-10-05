@@ -14,7 +14,6 @@ exports.login = function (req, res) {
     } else if (!findUser.authenticate(user.password)) {
       res.send({success: false, message: '密码错误'})
     } else {
-      console.log(findUser)
       req.session.userId = findUser._id
       req.session.modifyNum = findUser.modifyNum
       res.send({success: true, message: '登入成功',user: only(findUser, '-hashed_password -salt')})
