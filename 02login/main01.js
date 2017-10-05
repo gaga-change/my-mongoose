@@ -33,32 +33,12 @@ app.use(session({
     url: 'mongodb://localhost:27017/session01'
   })
 }))
-/* 每个请求，获取当前登入的账号，并赋值到req */
-app.use('/', function (req, res, next) {
-  return next()
-  if (req.session.accountId) {
-    User.findOne({_id: req.session.accountId}, function (err, account) {
-      if (err) {
-        res.send({success: false, message: err.toString()})
-      } else if (account) {
-        req.account = account
-        next()
-      } else {
-        next()
-      }
-    }).select('_id username createTime')
-  } else {
-    next()
-  }
-})
+
 const userDb = require('./db/user')
 /* 配置静态目录 */
 app.use('/', express.static('./page'))  // 存放静态页面目录
-app.use('/', userDb.session) // 获取session存储的用户
-app.post('/api/login', userDb.login)           // 登入接口
-app.post('/api/register', userDb.register)     // 注册接口
-app.get('/api/getAccount', userDb.getAccount)  // 获取当前登入账号接口
-app.get('/api/logout', userDb.logout)          // 退出登入接口
+require('./router.js')(app)             // 所有api请求
+
 /* 接收所有请求 */
 app.get('*', function (req, res) {
   res.send(404)
