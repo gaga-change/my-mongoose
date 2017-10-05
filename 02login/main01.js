@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo')(session)
+const router = require('express').Router()
 const User = require('./models/user_schema')
 
 mongoose.Promise = global.Promise
@@ -37,7 +38,7 @@ app.use(session({
 const userDb = require('./db/user')
 /* 配置静态目录 */
 app.use('/', express.static('./page'))  // 存放静态页面目录
-require('./router.js')(app)             // 所有api请求
+require('./router.js')(app, router)     // 所有api请求
 
 /* 接收所有请求 */
 app.get('*', function (req, res) {
