@@ -16,6 +16,7 @@ const Student = mongoose.model('Student', studentSchema)
 // let yanStudent = new Student({name: 'yanjundong东'})
 // yanStudent.save();
 
+console.log(new Student({name: 'yanjundong东'}).get('name'))
 new Student({name: 'yanjundong东'}).findName(function (err, stu) {
   if(err)
     console.log(err)

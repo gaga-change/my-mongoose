@@ -3,10 +3,11 @@ const crypto = require('crypto')
 const Schema = mongoose.Schema
 
 const UserSchema = new Schema({
-  username: {type: String},
+  username: {type: String, unique: true},
   // password: {type: String},
   hashed_password: {type: String, default: ''},
   salt: {type: String, default: ''},
+  modifyNum: {type: Number, default: 0}, // 修改密码的次数
   createTime: {type: Date, default: Date.now}
 })
 
@@ -28,6 +29,7 @@ UserSchema
  * Methods
  */
 UserSchema.methods = {
+
   /**
    * 创建 salt
    *
@@ -36,6 +38,7 @@ UserSchema.methods = {
   makeSalt: function () {
     return Math.round((new Date().valueOf() * Math.random())) + ''
   },
+
   /**
    * 验证 - 检测密码是否正确
    * 原理：使用同样的salt加密输入的密码得到的密文是否和存储的密文相同
@@ -62,6 +65,55 @@ UserSchema.methods = {
     } catch (err) {
       return ''
     }
+  }
+}
+
+/**
+ * Static
+ */
+UserSchema.statics = {
+  findById(userId, cb) {
+    return this.findOne({_id: userId})
+      .select('-hashed_password -salt')
+      .exec(cb)
+  },
+  /**
+   *  注册
+   * @param user
+   * @param cb
+   * @returns {err, user}
+   */
+  register(user, cb) {
+    if (!(user instanceof this)) {
+      user = new this(user);
+    }
+
+    if (!user.get('username')) {
+      return cb('用户名不能为空');
+    }
+    if (!user.get('password')) {
+      return cb('密码不能为空');
+    }
+    this.findOne({username: user.get('username')}, function (err, existingUser) {
+      if (err) {
+        return cb(err)
+      }
+
+      if (existingUser) {
+        return cb('用户名已存在');
+      }
+
+      user.save(function (saveErr) {
+        if (saveErr) {
+          return cb(saveErr)
+        }
+        cb(null, user)
+      })
+    })
+  },
+  findByUsername: function (username) {
+    const query = this.findOne({username})
+    return query
   }
 }
 module.exports = mongoose.model('User', UserSchema)
