@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>github 登入</title>
+    <script src="/static/lib/jquery.js"></script>
+</head>
+<body>
+
+<script>
+    $.get('/api/login/github/callback' + location.search, function (res) {
+      console.log(res)
+    })
+</script>
+</body>
+</html>

@@ -14,8 +14,8 @@ module.exports = function (app, router) {
     res.redirect(`https://github.com/login/oauth/authorize?scope=123&client_id=274df6a3dc60b0dd834c`)
   })
   router.get('/login/github/callback', function (req, res) {
-    console.log('喵喵喵？')
-    console.log(req.query)
+    // console.log('喵喵喵？')
+    // console.log(req.query)
     let url = `https://github.com/login/oauth/access_token?scope=123&client_id=274df6a3dc60b0dd834c&code=${req.query.code}&client_secret=e8dfc09c2a5544087f4fc01c646d3f57b302e0f5&redirect_url=http://localhost:8082/api/login/github/success`
     console.log(url)
     let data = ''
@@ -26,9 +26,6 @@ module.exports = function (app, router) {
         data += d.toString()
       })
       res.on('end', () => {
-        console.log(data)
-        let path = '/user?' + data
-        let hostname = 'https://api.github.com'
         const options = {
           hostname: 'api.github.com',
           path: '/user?' + data,
@@ -37,7 +34,7 @@ module.exports = function (app, router) {
           }
         }
         data = ''
-        console.log(options)
+        // console.log(options)
         // https.get('https://' + hostname + path, (res) => {
         https.get(options, (res) => {
           res.on('data', (d) => {
