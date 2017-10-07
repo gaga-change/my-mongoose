@@ -36,14 +36,25 @@ exports.githubCallback =  function (req, res) {
           if(data.message === 'Requires authentication') {
             return res.send({success: false, message: '停留时间过长，登入已失效，请重新登入'})
           }
-          // 获取到第三方信息后注册用户并登入
-          User.register({provider: 'github', github: data}, function (err, user) {
+          User.findOne({'github.id': data.id}).exec((err, user) => {
             if (err)
               return res.send({success: false, message: err.toString()})
-            req.session.userId = user._id
-            req.session.modifyNum = user.modifyNum
-            res.send({success: true})
+            if(user) {
+              req.session.userId = user._id
+              req.session.modifyNum = user.modifyNum
+              res.send({success: true})
+              return
+            }
+            // 获取到第三方信息后注册用户并登入
+            User.register({provider: 'github', github: data}, function (err, user) {
+              if (err)
+                return res.send({success: false, message: err.toString()})
+              req.session.userId = user._id
+              req.session.modifyNum = user.modifyNum
+              res.send({success: true})
+            })
           })
+
         })
       })
     })
