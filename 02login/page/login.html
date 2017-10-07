@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="UTF-8">
-  <title>主页</title>
-  <script src="/static/lib/jquery.js"></script>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <link rel="stylesheet" href="/static/css/public.css">
+    <script src="/static/lib/jquery.js"></script>
 </head>
 <body>
 <div>
-  <ul>
-    <li><a href="/">主页</a></li>
-    <li><a href="/login.html">登入</a></li>
-    <li><a href="/logout.html">退出</a></li>
-    <li><a href="/register.html">注册</a></li>
-  </ul>
+    <ul>
+        <li><a href="/">主页</a></li>
+        <li><a href="/login.html">登入</a></li>
+        <li><a href="/logout.html">退出</a></li>
+        <li><a href="/register.html">注册</a></li>
+    </ul>
 </div>
 <div>
-  <input type="text" id="username"> 用户名
-  <input type="text" id="password"> 密码
+    <label class="pt"><input type="text" id="username"> 用户名 或 邮箱</label>
+    <label class="pt"><input type="text" id="password"> 密码</label>
 </div>
 <div>
-  <button type="button" id="commit">登入</button>
+    <button type="button" id="commit">登入</button>
 </div>
 <script>
   $('#commit').click(function () {

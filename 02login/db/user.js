@@ -5,12 +5,12 @@ const only = require('only')
  * 登入
  */
 exports.login = function (req, res) {
-  const user = only(req.body, 'username password email')
-  User.findOne({username: user.username}, function (err, findUser) {
+  const user = only(req.body, 'username password')
+  User.findOne({$or: [{username: user.username}, {email: user.username}]}, function (err, findUser) {
     if (err) {
       res.send({success: false, message: err.toString()})
     } else if (!findUser) {
-      res.send({success: false, message: '用户名不存在'})
+      res.send({success: false, message: '用户名或邮箱不存在'})
     } else if (!findUser.authenticate(user.password)) {
       res.send({success: false, message: '密码错误'})
     } else {

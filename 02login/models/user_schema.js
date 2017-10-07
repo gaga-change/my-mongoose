@@ -104,8 +104,10 @@ UserSchema.statics = {
         return cb(err)
       }
 
-      if (existingUser) {
-        return cb('用户名已存在');
+      if (existingUser && existingUser.username === user.get('username')) {
+        return cb('用户名已存在')
+      } else if (existingUser) {
+        return cb('邮箱已存在');
       }
 
       user.save(function (saveErr) {

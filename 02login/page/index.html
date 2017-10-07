@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 <head>
-  <meta charset="UTF-8">
-  <title>主页</title>
-  <script src="/static/lib/jquery.js"></script>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <script src="/static/lib/jquery.js"></script>
 </head>
 <body>
 <div>
-  <ul>
-    <li><a href="/">主页</a></li>
-    <li><a href="/login.html">登入</a></li>
-    <li><a href="/logout.html">退出</a></li>
-    <li><a href="/register.html">注册</a></li>
-  </ul>
+    <ul>
+        <li><a href="/">主页</a></li>
+        <li><a href="/login.html">登入</a></li>
+        <li><a href="/logout.html">退出</a></li>
+        <li><a href="/register.html">注册</a></li>
+    </ul>
 </div>
 <div>
-  <button type="button" onclick="getAccount()">手动刷新</button>
-  <p id="msg"></p>
+    <button type="button" onclick="getAccount()">手动刷新</button>
+    <p id="msg"></p>
 </div>
 <script>
   getAccount()
@@ -27,8 +27,9 @@
         alert(res.message)
       } else if (res.account) {
         var username = res.account.username
+        var email = res.account.email
         var createTime = new Date(res.account.time.create)
-        $('#msg').text('用户名：' + username + '   创建时间：' + createTime.toLocaleString())
+        $('#msg').text('邮箱：' + email + '   用户名：' + username + '   创建时间：' + createTime.toLocaleString())
       } else {
         $('#msg').text('用户未登入')
       }
