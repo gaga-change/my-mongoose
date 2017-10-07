@@ -1,17 +1,21 @@
 const mongoose = require('mongoose')
 const crypto = require('crypto')
 const Schema = mongoose.Schema
-
+const oAuthTypes = [
+  'github',
+]
 const UserSchema = new Schema({
-  email: {type: String, unique: true},       // 邮箱？
-  username: {type: String, unique: true},           // 用户名
+  email: {type: String, default: ''},       // 邮箱？
+  username: {type: String, default: ''},           // 用户名
+  provider: {type: String, default: ''},     // 第三方登入类型
   hashed_password: {type: String, default: ''},
   salt: {type: String, default: ''},
   modifyNum: {type: Number, default: 0},        // 修改密码的次数
   time: {
     create: {type: Date, default: Date.now},
     modify: {type: Date, default: Date.now}
-  }
+  },
+  github: {}
 })
 
 /**
@@ -32,7 +36,13 @@ UserSchema
  * Methods
  */
 UserSchema.methods = {
-
+  /**
+   * 校验是否为第三方登入，是则返回 true
+   * @returns {number}
+   */
+  skipValidation: function () {
+    return ~oAuthTypes.indexOf(this.provider)
+  },
   /**
    * 创建 salt
    *
@@ -90,16 +100,20 @@ UserSchema.statics = {
     if (!(user instanceof this)) {
       user = new this(user);
     }
-    if (!user.get('email')) {
-      return cb('邮箱不能为空');
+    // 如果不是第三方登入，则进行常规教研
+    if (!user.skipValidation()) {
+      if (!user.get('email')) {
+        return cb('邮箱不能为空');
+      }
+      if (!user.get('username')) {
+        return cb('用户名不能为空');
+      }
+      if (!user.get('password')) {
+        return cb('密码不能为空');
+      }
     }
-    if (!user.get('username')) {
-      return cb('用户名不能为空');
-    }
-    if (!user.get('password')) {
-      return cb('密码不能为空');
-    }
-    this.findOne({$or:[{username: user.get('username')}, {email: user.get('email')}]}, function (err, existingUser) {
+    if (user.skipValidation()) return _save()
+    this.findOne({$or: [{username: user.get('username')}, {email: user.get('email')}]}, function (err, existingUser) {
       if (err) {
         return cb(err)
       }
@@ -109,14 +123,17 @@ UserSchema.statics = {
       } else if (existingUser) {
         return cb('邮箱已存在');
       }
+      _save()
+    })
 
+    function _save() {
       user.save(function (saveErr) {
         if (saveErr) {
           return cb(saveErr)
         }
         cb(null, user)
       })
-    })
+    }
   },
   findByUsername: function (username) {
     const query = this.findOne({username})
