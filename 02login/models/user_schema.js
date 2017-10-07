@@ -3,12 +3,15 @@ const crypto = require('crypto')
 const Schema = mongoose.Schema
 
 const UserSchema = new Schema({
-  username: {type: String, unique: true},
-  // password: {type: String},
+  email: {type: String, unique: true},       // 邮箱？
+  username: {type: String, unique: true},           // 用户名
   hashed_password: {type: String, default: ''},
   salt: {type: String, default: ''},
-  modifyNum: {type: Number, default: 0}, // 修改密码的次数
-  createTime: {type: Date, default: Date.now}
+  modifyNum: {type: Number, default: 0},        // 修改密码的次数
+  time: {
+    create: {type: Date, default: Date.now},
+    modify: {type: Date, default: Date.now}
+  }
 })
 
 /**
@@ -87,14 +90,16 @@ UserSchema.statics = {
     if (!(user instanceof this)) {
       user = new this(user);
     }
-
+    if (!user.get('email')) {
+      return cb('邮箱不能为空');
+    }
     if (!user.get('username')) {
       return cb('用户名不能为空');
     }
     if (!user.get('password')) {
       return cb('密码不能为空');
     }
-    this.findOne({username: user.get('username')}, function (err, existingUser) {
+    this.findOne({$or:[{username: user.get('username')}, {email: user.get('email')}]}, function (err, existingUser) {
       if (err) {
         return cb(err)
       }

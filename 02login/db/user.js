@@ -5,7 +5,7 @@ const only = require('only')
  * 登入
  */
 exports.login = function (req, res) {
-  const user = only(req.body, 'username password')
+  const user = only(req.body, 'username password email')
   User.findOne({username: user.username}, function (err, findUser) {
     if (err) {
       res.send({success: false, message: err.toString()})
@@ -46,7 +46,7 @@ exports.getAccount = function (req, res) {
  * 注册
  */
 exports.register = function (req, res) {
-  const user = only(req.body, 'username password')
+  const user = only(req.body, 'username password email')
   User.register(user, function (err, user) {
     if (err)
       return res.send({success: false, message: err.toString()})

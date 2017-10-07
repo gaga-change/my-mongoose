@@ -27,7 +27,7 @@
         alert(res.message)
       } else if (res.account) {
         var username = res.account.username
-        var createTime = new Date(res.account.createTime)
+        var createTime = new Date(res.account.time.create)
         $('#msg').text('用户名：' + username + '   创建时间：' + createTime.toLocaleString())
       } else {
         $('#msg').text('用户未登入')
