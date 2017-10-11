@@ -2,39 +2,114 @@
 <html lang="zh-cmn-Hans">
 <head>
     <meta charset="UTF-8">
-    <title>主页</title>
-    <link rel="stylesheet" href="/static/css/public.css">
+    <title>登入&注册</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <script src="/static/lib/jquery.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div>
-    <ul>
-        <li><a href="/">主页</a></li>
-        <li><a href="/login.html">登入</a></li>
-        <li><a href="/logout.html">退出</a></li>
-        <li><a href="/register.html">注册</a></li>
-    </ul>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="page-header">
+                <h1>
+                    传说中的登入注册
+                    <small>极简</small>
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="tabbable" id="tabs-570410">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#panel-139477" data-toggle="tab">注册</a>
+                    </li>
+                    <li>
+                        <a href="#panel-566087" data-toggle="tab">登入</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="panel-139477">
+
+                        <form role="form">
+                            <div class="form-group">
+                                <label for="email">邮箱</label><input type="email" class="form-control" id="email"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">用户名</label><input type="text" class="form-control"
+                                                                        id="username"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordRegister">密码</label>
+                                <input type="password" class="form-control" placeholder="不少于6位" id="passwordRegister"/>
+                            </div>
+                            <div class="form-group">
+                                <button class=" form-control btn btn-info" type="button" id="registerButton">注册</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="panel-566087">
+                        <form role="form">
+                            <div class="form-group">
+                                <label for="name">邮箱或用户名</label>
+                                <input type="text" class="form-control" id="name"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="passwordLogin">密码</label>
+                                <input type="password" class="form-control" placeholder="不少于6位" id="passwordLogin"/>
+                            </div>
+                            <div class="form-group">
+                                <button class=" form-control btn btn-info" type="button" id="loginButton">登入</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <label class="pt"><input type="text" id="username"> 用户名 或 邮箱</label>
-    <label class="pt"><input type="text" id="password"> 密码</label>
-</div>
-<div>
-    <button type="button" id="commit">登入</button>
-</div>
-<div>
-    <a href="/api/login/github">github 登入</a>
-</div>
+<script src="/static/js/common.js"></script>
 <script>
-  $('#commit').click(function () {
-    var username = $('#username').val()
-    var password = $('#password').val()
+  /* 登入 */
+  $('#loginButton').click(function () {
+    var username = $('#name').val()
+    var password = $('#passwordLogin').val()
     $.post('/api/login', {username, password}, function (res) {
       if (res.success) {
-        alert('登入成功')
         location.href = '/'
       } else {
-        alert(res.message)
+        window.myAlert(res.message)
+      }
+    })
+  })
+  /* 注册 */
+  $('#registerButton').click(function () {
+    var username = $('#username').val()
+    var password = $('#passwordRegister').val()
+    var email = $('#email').val()
+
+    var ePattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/
+    if (!ePattern.test(email)) {
+      window.myAlert('请输入正确的邮箱！')
+      return
+    }
+    // 用户名正则，4到16位（字母，数字，下划线，减号）
+    if (!/^[a-zA-Z0-9_-]{2,16}$/.test(username)) {
+      window.myAlert('用户名 4到16位（字母，数字，下划线，减号）')
+      return
+    }
+    if (password.length < 6 || password.length > 24) {
+      window.myAlert('密码位数不能小于6位且不大于24')
+      return
+    }
+    $.post('/api/register', {username, password, email}, function (res) {
+      if (res.success) {
+        location.href = '/'
+      } else {
+        window.myAlert(res.message)
       }
     })
   })
