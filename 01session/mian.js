@@ -21,7 +21,7 @@ app.use(session({
 /* 接收所有请求 */
 app.get('*', send)
 
-function send(req, res) {
+function send (req, res) {
   const path = req.path // 获取请求路径
   res.write(`<head><meta charset="UTF-8"><title>Title</title></head>`) // 配置编码
   res.write(`<a href="/">Home</a> <a href="/page1">page1</a> <a href="/page2">page2</a><br>`) // 配置导航

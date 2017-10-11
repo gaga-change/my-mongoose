@@ -8,15 +8,14 @@ const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo')(session)
 const router = require('express').Router()
-const User = require('./models/user_schema')
 
 mongoose.Promise = global.Promise
 let app = express()
-app.use('/static', express.static('./static'))   // 配置静态资源目录
+app.use('/static', express.static('./static')) // 配置静态资源目录
 app.get('/favicon.ico', function (req, res) {
   res.send('gaga')
 })
-app.use(bodyParser.json())                       // for parsing application/json
+app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({extended: true})) // for parsing application/x-www-form-urlencoded
 /* cookie解析 */
 app.use(cookieParser())
@@ -35,10 +34,9 @@ app.use(session({
   })
 }))
 
-const userDb = require('./db/user')
 /* 配置静态目录 */
-app.use('/', express.static('./page'))  // 存放静态页面目录
-require('./router.js')(app, router)     // 所有api请求
+app.use('/', express.static('./page')) // 存放静态页面目录
+require('./router.js')(app, router) // 所有api请求
 
 /* 接收所有请求 */
 app.get('*', function (req, res) {

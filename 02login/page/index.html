@@ -21,7 +21,7 @@
 <script>
   getAccount()
 
-  function getAccount() {
+  function getAccount () {
     $.get('/api/getAccount', function (res) {
       if (!res.success) {
         alert(res.message)

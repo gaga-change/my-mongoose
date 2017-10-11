@@ -48,8 +48,7 @@ exports.getAccount = function (req, res) {
 exports.register = function (req, res) {
   const user = only(req.body, 'username password email')
   User.register(user, function (err, user) {
-    if (err)
-      return res.send({success: false, message: err.toString()})
+    if (err) return res.send({success: false, message: err.toString()})
     req.session.userId = user._id
     req.session.modifyNum = user.modifyNum
     res.send({success: true})
