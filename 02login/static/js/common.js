@@ -9,7 +9,6 @@
    * @param msg
    */
   window.myAlert = function (msg) {
-    console.log('???')
     var template = $(`
       <div class="column">
       <div class="alert alert-dismissable alert-warning">
