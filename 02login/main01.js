@@ -2,6 +2,7 @@
  * Created by yanjd on 2017/9/26.
  */
 const express = require('express')
+const path = require('path')
 const session = require('express-session')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -13,7 +14,7 @@ mongoose.Promise = global.Promise
 let app = express()
 app.use('/static', express.static('./static')) // 配置静态资源目录
 app.get('/favicon.ico', function (req, res) {
-  res.send('gaga')
+  res.sendFile(path.join(__dirname, 'static/favicon.ico'))
 })
 app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({extended: true})) // for parsing application/x-www-form-urlencoded
@@ -23,7 +24,7 @@ app.use(cookieParser())
 app.use(session({
   secret: '123456',
   name: 'sessionId', // cookie中的键名，用于存储sessionId
-  cookie: {maxAge: 2 * 60 * 1000}, // cookie保存的时间
+  cookie: {maxAge: 24 * 60 * 60 * 1000}, // cookie保存的时间
   resave: false,
   saveUninitialized: true,
   store: new MongoStore({
