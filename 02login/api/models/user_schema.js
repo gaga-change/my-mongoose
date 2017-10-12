@@ -21,14 +21,11 @@ const UserSchema = new Schema({
 /**
  * 创建虚拟属性password
  */
-UserSchema
-.virtual('password')
-.set(function (password) {
+UserSchema.virtual('password').set(function (password) {
   this._password = password
   this.salt = this.makeSalt() // 获取随机 salt
   this.hashed_password = this.encryptPassword(password) // 加密密码
-})
-.get(function () {
+}).get(function () {
   return this._password
 })
 
@@ -71,10 +68,7 @@ UserSchema.methods = {
   encryptPassword: function (password) {
     if (!password) return ''
     try {
-      return crypto
-      .createHmac('sha1', this.salt)
-      .update(password)
-      .digest('hex')
+      return crypto.createHmac('sha1', this.salt).update(password).digest('hex')
     } catch (err) {
       return ''
     }
@@ -86,9 +80,7 @@ UserSchema.methods = {
  */
 UserSchema.statics = {
   findById (userId, cb) {
-    return this.findOne({_id: userId})
-    .select('-hashed_password -salt')
-    .exec(cb)
+    return this.findOne({_id: userId}).select('-hashed_password -salt').exec(cb)
   },
   /**
    *  注册
@@ -135,7 +127,7 @@ UserSchema.statics = {
       })
     }
   },
-  findByUsername:  function (username) {
+  findByUsername: function (username) {
     const query = this.findOne({username})
     return query
   }
