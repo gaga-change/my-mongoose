@@ -37,7 +37,7 @@ app.use(session({
 
 /* 配置静态目录 */
 app.use('/', express.static('./page')) // 存放静态页面目录
-require('./router.js')(app, router) // 所有api请求
+require('./api/router.js')(app, router) // 所有api请求
 
 /* 接收所有请求 */
 app.get('*', function (req, res) {
