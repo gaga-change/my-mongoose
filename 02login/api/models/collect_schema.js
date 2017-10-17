@@ -7,14 +7,11 @@ const Schema = mongoose.Schema
 
 const CollectSchema = new Schema({
   user: {type: Schema.ObjectId, ref: 'User'},
-  private: [{
+  collect: [{
     fileName: {type: String, default: ''},
-    url: {type: Schema.objectId, ref: 'Url'}
+    url: {type: Schema.objectId, ref: 'Address'}
   }],
-  grade: {type: Object, default: ''},
-  share: [{
-    url: {type: Schema.objectId, ref: 'Url'}
-  }]
+  grade: {type: Object, default: ''}
 })
 
 module.exports = mongoose.model('Collect', CollectSchema)

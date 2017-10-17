@@ -17,12 +17,10 @@ const AddressSchema = new Schema({
   }
 })
 
+/* 实例方法 */
 AddressSchema.methods = {}
 
-AddressSchema.statics = {
-  add (address) {
-
-  }
-}
+/* 静态方法 */
+AddressSchema.statics = {}
 
 module.exports = mongoose.model('address', AddressSchema)
