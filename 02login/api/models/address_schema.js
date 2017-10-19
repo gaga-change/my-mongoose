@@ -10,12 +10,8 @@ const AddressSchema = new Schema({
   share: {type: Boolean, default: false},
   title: {type: String, default: ''},
   detail: {type: String, default: ''},
-  url: {type: String, default: ''},
-  time: {
-    create: {type: Date, default: Date.now()},
-    modify: {type: Date, default: Date.now()}
-  }
-})
+  url: {type: String, default: ''}
+}, {timestamps: {createdAt: true, updateAt: true}})
 
 /* 实例方法 */
 AddressSchema.methods = {}

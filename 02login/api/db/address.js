@@ -7,6 +7,7 @@ const only = require('only')
 exports.add = function (req, res) {
   let address = only(req.body, 'title detail url')
   address = new Address(address)
+  address.user = req.user._id
   address.save((err, address) => {
     if (err) return res.send({success: false, message: err.message})
     else return res.send({success: true})

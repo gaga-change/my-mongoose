@@ -1,6 +1,7 @@
 const user = require('./db/user.js')
 const github = require('./db/github.js')
 const address = require('./db/address.js')
+const auth = require('./middleware/auth.js')
 
 module.exports = function (app, router) {
   /* 用户 User */
@@ -15,7 +16,7 @@ module.exports = function (app, router) {
   router.get('/login/github/callback', github.githubCallback) // github登入回调地址
 
   /* 收藏 */
-  router.post('/address/add', address.add)
+  router.post('/address/add', auth.requireLogin, address.add)
   // 配置接口前缀
   app.use('/api', router)
 }

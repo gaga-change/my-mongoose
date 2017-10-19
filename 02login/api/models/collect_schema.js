@@ -21,7 +21,6 @@ CollectSchema.methods = {}
 CollectSchema.statics = {
   // 根据用户ID获取 收藏夹的目录
   findGradeByUserId (userId) {
-
   }
 }
 
