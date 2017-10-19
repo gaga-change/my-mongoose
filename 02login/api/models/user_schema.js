@@ -132,4 +132,4 @@ UserSchema.statics = {
     return query
   }
 }
-module.exports = mongoose.model('UserNew', UserSchema)
+module.exports = mongoose.model('User', UserSchema)

@@ -9,9 +9,9 @@ const CollectSchema = new Schema({
   user: {type: Schema.ObjectId, ref: 'User'},
   collect: [{
     fileName: {type: String, default: ''},
-    url: {type: Schema.objectId, ref: 'Address'}
+    url: {type: Schema.ObjectId, ref: 'address'}
   }],
-  grade: {type: Object, default: ''}
+  grade: {type: Array, default: []}
 })
 
 /* 实例方法 */
