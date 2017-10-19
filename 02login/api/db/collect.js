@@ -9,10 +9,10 @@ const only = require('only')
  * 获取目录
  */
 exports.getGrade = function (req, res) {
-  Collect.findOne({user: req.user._id}).select('grade').exec((err, collect) => {
+  Collect.findOne({user: req.user}).select('grade').exec((err, collect) => {
     if (err) res.send({success: false, message: err.toString()})
     else if (collect) {
-      res.send({success: true, collect})
+      res.send({success: true, grade: collect.grade})
     } else {
       new Collect({user: req.user}).save(err => {
         if (err) res.send({success: false, message: err.toString()})
@@ -23,7 +23,7 @@ exports.getGrade = function (req, res) {
 }
 
 /**
- *
+ * 增加目录
  */
 exports.addGrade = function (req, res) {
   let gradeName = req.body.gradeName
