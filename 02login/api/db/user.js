@@ -64,7 +64,7 @@ exports.session = function (req, res, next) {
   if (!userId) return next()
   User.findById(userId, function (err, user) {
     if (err) return res.send({success: false, message: err.toString()})
-    if (user.modifyNum === modifyNum) {
+    if (user && user.modifyNum === modifyNum) {
       req.user = user
     }
     next()
