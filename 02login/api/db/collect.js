@@ -3,7 +3,7 @@
  */
 
 const Collect = require('../models/collect_schema')
-const only = require('only')
+// const only = require('only')
 
 /**
  * 获取目录
@@ -78,5 +78,5 @@ exports.rename = function (req, res) {
       }
     })
   })
-
 }
+
