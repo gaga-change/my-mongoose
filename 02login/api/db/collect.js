@@ -9,9 +9,8 @@ const only = require('only')
  * 获取目录
  */
 exports.getGrade = function (req, res) {
-  Collect.findOne({user: req.user}).select('grade').exec((err, collect) => {
-    if (err) res.send({success: false, message: err.toString()})
-    else if (collect) {
+  Collect.findOne({user: req.user}).select('grade').then(collect => {
+    if (collect) {
       res.send({success: true, grade: collect.grade})
     } else {
       new Collect({user: req.user}).save(err => {
@@ -28,9 +27,8 @@ exports.getGrade = function (req, res) {
 exports.addGrade = function (req, res) {
   let gradeName = req.body.gradeName
   if (!gradeName) return res.send({success: false, message: '目录名不能为空'})
-  Collect.update({user: req.user}, {$addToSet: {grade: gradeName}}, {upsert: true}).select('grade').exec((err, msg) => {
-    if (err) res.send({success: false, message: err.toString()})
-    else if (msg.nModified) {
+  Collect.update({user: req.user}, {$addToSet: {grade: gradeName}}, {upsert: true}).select('grade').then(msg => {
+    if (msg.nModified) {
       res.send({success: true})
     } else {
       res.send({success: false, message: '已存在相同目录'})
@@ -51,10 +49,11 @@ exports.deleteGrade = function (req, res) {
   if (gradeNames.constructor !== Array) return res.send({success: false, message: '参数需为数组'})
   if (!gradeNames.length) return res.send({success: false, message: '目录名不能为空'})
   console.log(gradeNames)
-  Collect.update({user: req.user}, {$pullAll: {grade: gradeNames}}, {upsert: true}).select('grade').then((msg) => {
-    if (msg) res.send({success: false, message: msg.toString()})
-    else {
-      res.send({success: true, msg})
+  Collect.update({user: req.user}, {$pullAll: {grade: gradeNames}}, {upsert: true}).select('grade').then(msg => {
+    if (msg.nModified) {
+      res.send({success: true})
+    } else {
+      res.send({success: false, message: '目录名不存在'})
     }
   })
 }
@@ -73,7 +72,6 @@ exports.rename = function (req, res) {
     if (exist) return res.send({success: false, message: '新目录名已存在'})
     Collect.update({user: req.user, grade: oldGradeName}, {$set: {'grade.$': newGradeName}}).select('grade').then(msg => {
       if (msg.nModified) {
-        console.log(msg)
         res.send({success: true})
       } else {
         res.send({success: false, message: '目录名不存在'})
