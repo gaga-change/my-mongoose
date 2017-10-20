@@ -21,6 +21,7 @@ module.exports = function (app, router) {
   router.get('/collect/grade', auth.requireLogin, collect.getGrade) // 获取目录列表
   router.post('/collect/grade', auth.requireLogin, collect.addGrade) // 增加目录
   router.delete('/collect/grade', auth.requireLogin, collect.deleteGrade) // 删除目录
+  router.put('/collect/grade', auth.requireLogin, collect.rename) // 重命名目录
   // 配置接口前缀
   app.use('/api', router)
 }

@@ -16,7 +16,7 @@ exports.login = function (req, res) {
     } else {
       req.session.userId = findUser._id
       req.session.modifyNum = findUser.modifyNum
-      res.send({success: true, message: '登入成功',user: only(findUser, '-hashed_password -salt')})
+      res.send({success: true, message: '登入成功', user: only(findUser, '-hashed_password -salt')})
     }
   })
 }
