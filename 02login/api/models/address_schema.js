@@ -13,8 +13,16 @@ const AddressSchema = new Schema({
   url: {type: String, default: ''}
 }, {timestamps: {createdAt: true, updateAt: true}})
 
+AddressSchema.path('url').validate(function (url) {
+  return url && url.length
+}, '路径不能为空')
+
+AddressSchema.path('title').required(true, '标题不能为空')
+
 /* 实例方法 */
-AddressSchema.methods = {}
+AddressSchema.methods = {
+  // save
+}
 
 /* 静态方法 */
 AddressSchema.statics = {}

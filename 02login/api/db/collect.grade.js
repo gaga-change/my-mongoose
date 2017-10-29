@@ -79,4 +79,3 @@ exports.rename = function (req, res) {
     })
   })
 }
-
