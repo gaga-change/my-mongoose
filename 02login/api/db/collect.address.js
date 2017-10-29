@@ -18,7 +18,14 @@ exports.add = function (req, res) {
   adrs = new Address(adrs)
   adrs.user = req.user
   adrs.save().then((address) => {
-    Collect.update({user: req.user, grade: params.fileName}, {$push: {collect: {fileName: params.fileName, address}}}).then((msg) => {
+    Collect.update({user: req.user, grade: params.fileName}, {
+      $push: {
+        collect: {
+          fileName: params.fileName,
+          address
+        }
+      }
+    }).then((msg) => {
       if (msg.nModified) {
         res.send({success: true})
       } else {
@@ -27,8 +34,7 @@ exports.add = function (req, res) {
       }
     })
   }).catch((err) => {
-    const errors = Object.keys(err.errors)
-      .map(key => err.errors[key].message)
+    const errors = Object.keys(err.errors).map(key => err.errors[key].message)
     res.send({success: false, message: errors[0], errors})
   })
 }
@@ -38,8 +44,22 @@ exports.add = function (req, res) {
  */
 
 exports.delete = function (req, res, next) {
-  let params = only(req.body, 'id')
-
+  let params = only(req.body, 'idArr')
+  let idArr = params.idArr || ''
+  if (!idArr) { // 不存在
+    res.send({success: false, message: '删除的收藏不存在'})
+  } else {
+    idArr = idArr.split(',')
+    Promise.all([Collect.update({user: req.user}, {
+      '$pull': {
+        collect: {
+          $eleMatch: {_id: {$in: idArr}}
+        }
+      }
+    }), Address.remove({_id: {$in: idArr}})]).then(msgs => {
+      res.send({success: true, msgs})
+    })
+  }
 }
 
 /**

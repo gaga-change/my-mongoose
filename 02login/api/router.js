@@ -28,6 +28,7 @@ module.exports = function (app, router) {
   router.put('/collect/grade', collectGrade.rename) // 重命名目录
 
   router.post('/collect/address', collectAddress.add) // 添加收藏
+  router.delete('/collect/address', collectAddress.delete) // 添加收藏
 
   // 配置接口前缀
   app.use('/api', router)
