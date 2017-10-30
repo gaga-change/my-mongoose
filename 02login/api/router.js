@@ -29,6 +29,7 @@ module.exports = function (app, router) {
 
   router.post('/collect/address', collectAddress.add) // 添加收藏
   router.delete('/collect/address', collectAddress.delete) // 添加收藏
+  router.put('/collect/address', collectAddress.put) // 修改收藏
 
   // 配置接口前缀
   app.use('/api', router)

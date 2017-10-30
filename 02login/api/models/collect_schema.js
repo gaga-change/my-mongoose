@@ -9,7 +9,7 @@ const CollectSchema = new Schema({
   user: {type: Schema.ObjectId, ref: 'User'},
   collect: [{
     fileName: {type: String, default: ''},
-    addresses: {type: Schema.ObjectId, ref: 'address'}
+    address: {type: Schema.ObjectId, ref: 'address'}
   }],
   grade: {type: Array, default: []}
 })
