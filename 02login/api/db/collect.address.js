@@ -74,23 +74,28 @@ exports.put = function (req, res) {
   if (!params.id || params.id.toString().length === 0) {
     res.send({success: false, message: 'id 值不能为空'})
   } else if (params.fileName) { // 修改目录操作
-    Collect.findOne({user: req.user, grade: params.fileName}).then(collect => {
+    Collect.findOne({user: req.user, grade: params.fileName}).select('_id').then(collect => {
       console.log(collect)
       if (collect) {
-        Collect.find({
+        var cursor = Collect.find({
           user: req.user,
           'collect._id': {$in: params.id.split(',')}
-        }, {collect: {$eleMatch: {fileName: params.fileName}}}).then(msg => {
-          res.send({success: true, msg})
         })
+        while (cursor.hasNext()) {
+          let doc = cursor.next()
+          // let from = doc.from
+          // let type = doc.type
+          console.log(doc)
+        }
+        res.send({})
       } else {
         res.send({success: false, message: `不存在 ${params.fileName} 这个目录`})
       }
     })
   } else { // 修改链接相关参数
-    Address.update({id: params.id}, {title: params.title, detail: params.detail, url: params.url}).then((msg => {
+    Address.update({id: params.id}, {title: params.title, detail: params.detail, url: params.url}).then(msg => {
       res.send({success: true, msg})
-    })).catch((err) => {
+    }).catch((err) => {
       const errors = Object.keys(err.errors).map(key => err.errors[key].message)
       res.send({success: false, message: errors[0], errors})
     })
