@@ -7,12 +7,10 @@ const Schema = mongoose.Schema
 
 const CollectSchema = new Schema({
   user: {type: Schema.ObjectId, ref: 'User'},
-  collect: [{
-    fileName: {type: String, default: ''},
-    address: {type: Schema.ObjectId, ref: 'address'}
-  }],
-  grade: {type: Array, default: []}
-})
+  father: {type: Schema.ObjectId, ref: 'Grade'},
+  name: {type: String, default: ''},
+  sort: {type: Date, default: Date.now()}
+}, {timestamps: {createdAt: true, updateAt: true}})
 
 /* 实例方法 */
 CollectSchema.methods = {}
@@ -24,4 +22,4 @@ CollectSchema.statics = {
   }
 }
 
-module.exports = mongoose.model('Collect', CollectSchema)
+module.exports = mongoose.model('Grade', CollectSchema)

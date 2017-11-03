@@ -41,7 +41,7 @@ require('./api/router.js')(app, router) // 所有api请求
 
 /* 接收所有请求 */
 app.get('*', function (req, res) {
-  res.send(404)
+  res.sendStatus(404)
 })
 
 mongoose.connect('mongodb://localhost/session01', {useMongoClient: true}).then(function () {
