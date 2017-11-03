@@ -9,8 +9,8 @@ const CollectSchema = new Schema({
   user: {type: Schema.ObjectId, ref: 'User'},
   father: {type: Schema.ObjectId, ref: 'Grade'},
   name: {type: String, default: ''},
-  sort: {type: Date, default: Date.now()}
-}, {timestamps: {createdAt: true, updateAt: true}})
+  sort: {type: Date, default: Date.now}
+})
 
 /* 实例方法 */
 CollectSchema.methods = {}

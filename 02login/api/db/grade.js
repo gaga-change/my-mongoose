@@ -3,16 +3,19 @@
  */
 
 const Grade = require('../models/grade_schema')
-// const only = require('only')
+const only = require('only')
 
 /**
  * 增加目录
+ *  限制最多20条
  */
 exports.add = function (req, res) {
-  let gradeName = req.body.gradeName
+  const params = only(req.body, 'name')
+  let gradeName = params.name
   if (!gradeName) return res.send({success: false, message: '目录名不能为空'})
-  Grade.update({user: req.user}, {$addToSet: {grade: gradeName}}, {upsert: true}).select('grade').then(msg => {
-    if (msg.nModified) {
+  Grade.update({user: req.user, name: gradeName}, {}, {upsert: true}).then(msg => {
+    console.log(msg)
+    if (msg.upserted) {
       res.send({success: true})
     } else {
       res.send({success: false, message: '已存在相同目录'})
@@ -68,14 +71,7 @@ exports.modify = function (req, res) {
  * 获取目录
  */
 exports.get = function (req, res) {
-  Grade.findOne({user: req.user}).select('grade').then(Grade => {
-    if (Grade) {
-      res.send({success: true, grade: Grade.grade})
-    } else {
-      new Grade({user: req.user}).save(err => {
-        if (err) res.send({success: false, message: err.toString()})
-        else res.send({success: true, grade: []})
-      })
-    }
+  Grade.find({user: req.user}).select('_id name').then(grade => {
+    res.send({success: true, grade: grade})
   })
 }

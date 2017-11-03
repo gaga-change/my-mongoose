@@ -24,7 +24,7 @@ app.use(cookieParser())
 app.use(session({
   secret: '123456',
   name: 'sessionId', // cookie中的键名，用于存储sessionId
-  cookie: {maxAge: 24 * 60 * 60 * 1000}, // cookie保存的时间
+  cookie: {secure: false, maxAge: 24 * 60 * 60 * 1000}, // cookie保存的时间
   resave: false,
   saveUninitialized: true,
   store: new MongoStore({
