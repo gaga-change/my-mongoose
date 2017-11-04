@@ -10,7 +10,7 @@
 <script>
     $.get('/api/login/github/callback' + location.search, function (res) {
       console.log(res)
-      if(!res.success) {
+      if (!res.success) {
         alert(res.message)
       } else {
         alert('登入成功！')
