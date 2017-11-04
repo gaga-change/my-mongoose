@@ -12,7 +12,7 @@ const only = require('only')
 exports.add = function (req, res) {
   const params = only(req.body, 'name')
   let gradeName = params.name
-  if (!gradeName) return res.send({success: false, message: '目录名不能为空'})
+  if (!gradeName || gradeName.length > 10) return res.send({success: false, message: '目录名不能为空，且长度不能大于10位'})
   Grade.update({user: req.user, name: gradeName}, {}, {upsert: true}).then(msg => {
     if (msg.upserted) {
       res.send({success: true})
@@ -37,7 +37,9 @@ exports.delete = function (req, res) {
  */
 exports.modify = function (req, res) {
   const params = only(req.body, 'id name')
-  Grade.update({_id: params.id}, {name: params.name}).then((msg) => {
+  const gradeName = params.name
+  if (!gradeName || gradeName.length > 10) return res.send({success: false, message: '目录名不能为空，且长度不能大于10位'})
+  Grade.update({_id: params.id}, {name: gradeName}).then((msg) => {
     res.send({success: true, msg})
   })
 }

@@ -52,7 +52,11 @@
   // 添加目录
   function addGrade(e) {
     var name = data.text.newGrade
-    if (name) {
+    if (!name) {
+      common.alert('目录名不能为空！')
+    } else if (name.length > 10) {
+      common.alert('目录名超长，不能超过10个字！')
+    } else {
       api.grade.add({name}, function (err) {
         if (!err) {
           data.text.newGrade = ''
@@ -60,8 +64,6 @@
           setGrade()
         }
       })
-    } else {
-      common.alert('目录名不能为空！')
     }
   }
 
@@ -79,13 +81,16 @@
     var id = data.grade[data.gradeCheckIndex]._id
     var name = data.text.modifyGrade
     if (!name) {
-      return common.alert('目录名不能为空！')
+      common.alert('目录名不能为空！')
+    } else if (name.length > 10) {
+      common.alert('目录名超长，不能超过10个字！')
+    } else {
+      api.grade.modify({id, name}, function (err) {
+        data.text.modifyGrade = ''
+        $('#newGradeInput').val('')
+        setGrade()
+      })
     }
-    api.grade.modify({id, name}, function (err) {
-      data.text.modifyGrade = ''
-      $('#newGradeInput').val('')
-      setGrade()
-    })
   }
 
   // 改变当前选中菜单
