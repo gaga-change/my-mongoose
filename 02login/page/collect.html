@@ -27,9 +27,9 @@
                     </ul>
                     <form class="navbar-form navbar-left" role="search">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="添加目录" id="inputGrade"/>
+                            <input type="text" class="form-control" placeholder="添加目录" id="addGradeInput"/>
                         </div>
-                        <button type="button" class="btn btn-default" onclick="addGrade()">提交</button>
+                        <button type="button" class="btn btn-default" id="addGradeBtn">提交</button>
                     </form>
                 </div>
 
@@ -64,10 +64,10 @@
                     <form role="form">
                         <div class="form-group">
                             <label for="inputNewGradeName">新目录名</label>
-                            <input type="text" class="form-control" id="inputNewGradeName"/>
+                            <input type="text" class="form-control" id="newGradeInput"/>
                         </div>
-                        <button type="button" onclick="modifyGradeName()" class="btn btn-default">修改目录名</button>
-                        <button type="button" onclick="deleteGradeName()" class="btn btn-default">删除该目录</button>
+                        <button type="button" id="modifyGradeNameBtn" class="btn btn-default">修改目录名</button>
+                        <button type="button" id="deleteGradeNameBtn" class="btn btn-default">删除该目录</button>
                     </form>
                 </div>
             </div>
@@ -100,21 +100,12 @@
 </div>
 <script src="/static/js/common.js"></script>
 <script src="/static/js/api.js"></script>
+<script src="/static/js/collect/main.js"></script>
 <script>
-  init()
 
-  var Grade = null
-  var GradeCheck = 0
-
-  function init () {
-    getGrade()
-  }
-
-  $('#menuList').click(menuListClick)
-
-  /**
+/*  /!**
    * 点击菜单
-   */
+   *!/
   function menuListClick (e) {
     $(e.currentTarget).find('li').removeClass('active')
     $(e.target).parent().addClass('active')
@@ -122,9 +113,9 @@
     GradeCheck = index
   }
 
-  /**
+  /!**
    * 获取该用户的目录列表
-   */
+   *!/
   function getGrade () {
     $.get('/api/collect/grade').then(function (res) {
       Grade = res.grade
@@ -137,9 +128,9 @@
     })
   }
 
-  /**
+  /!**
    * 修改目录名
-   */
+   *!/
   window.modifyGradeName = function () {
     var newGradeName = $('#inputNewGradeName').val()
     if (!newGradeName) return window.myAlert('请输入新目录名！')
@@ -158,9 +149,9 @@
     })
   }
 
-  /**
+  /!**
    * 删除目录
-   */
+   *!/
   window.deleteGradeName = function () {
     $.ajax({type: 'delete', url: '/api/collect/grade', data: {gradeNames: JSON.stringify([Grade[GradeCheck]])}}).then(res => {
       if (res.success) {
@@ -172,9 +163,9 @@
       }
     })
   }
-  /**
+  /!**
    * 添加新目录
-   */
+   *!/
   window.addGrade = function () {
     var gradeName = $('#inputGrade').val()
     if (!gradeName) return window.myAlert('请输入目录名！')
@@ -200,7 +191,7 @@
         console.log(res.message)
       }
     })
-  }
+  }*/
 </script>
 </body>
 </html>

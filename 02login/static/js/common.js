@@ -29,7 +29,7 @@
     function _createCon () {
       if (!AlertCon) {
         AlertCon = $(`<div style="position: fixed; left: 0; bottom: 0"></div>`)
-        $('body').append(con)
+        $('body').append(AlertCon)
       }
       return AlertCon
     }
