@@ -1,14 +1,14 @@
 const user = require('./db/user.js')
 const github = require('./db/github.js')
 // const address = require('./db/address.js')
+const siteAddress = require('./db/sit.address.js')
 const grade = require('./db/grade.js')
-// const collectAddress = require('./db/collect.address.js')
 const auth = require('./middleware/auth.js')
 
 module.exports = function (app, router) {
+  const login = auth.requireLogin
   /* 中间件 */
   router.use('/', user.session) // 获取session存储的用户
-  router.use(/(\/grade)/, auth.requireLogin) // 获取session存储的用户
 
   /* 用户 User */
   router.post('/login', user.login) // 登入接口
@@ -21,11 +21,15 @@ module.exports = function (app, router) {
   router.get('/login/github/callback', github.githubCallback) // github登入回调地址
 
   /* 目录操作 */
-  router.post('/grade', grade.add) // 增加目录
-  router.delete('/grade', grade.delete) // 删除目录
-  router.put('/grade', grade.modify) // 重命名目录
+  router.post('/grade', login, grade.add) // 增加目录
+  router.delete('/grade', login, grade.delete) // 删除目录
+  router.put('/grade', login, grade.modify) // 重命名目录
   router.get('/grade', grade.get) // 获取目录列表
 
+  router.post('/collect/address', login, siteAddress) // 添加收藏
+  router.delete('/collect/address', login, siteAddress) // 删除收藏
+  router.put('/collect/move', login, siteAddress) // 移动收藏
+  router.get('/collect', siteAddress) // 查询收藏
   // router.post('/collect/address', collectAddress.add) // 添加收藏
   // router.delete('/collect/address', collectAddress.delete) // 添加收藏
   // router.put('/collect/address', collectAddress.put) // 修改收藏
