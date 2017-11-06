@@ -10,7 +10,8 @@ const AddressSchema = new Schema({
   share: {type: Boolean, default: false},
   title: {type: String, default: ''},
   detail: {type: String, default: ''},
-  url: {type: String, default: ''}
+  url: {type: String, default: ''},
+  tab: {type: Array, default: []}
 }, {timestamps: {createdAt: true, updateAt: true}})
 
 AddressSchema.path('url').validate(function (url) {

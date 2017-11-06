@@ -8,7 +8,7 @@ const auth = require('./middleware/auth.js')
 module.exports = function (app, router) {
   /* 中间件 */
   router.use('/', user.session) // 获取session存储的用户
-  // router.use(/(\/grade)/, auth.requireLogin) // 获取session存储的用户
+  router.use(/(\/grade)/, auth.requireLogin) // 获取session存储的用户
 
   /* 用户 User */
   router.post('/login', user.login) // 登入接口
