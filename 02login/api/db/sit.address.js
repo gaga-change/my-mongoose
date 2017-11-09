@@ -7,8 +7,8 @@ const only = require('only')
 
 // 添加收藏
 exports.add = function (req, res) {
-  const params = only(req.body, 'title detail url gradeId')
-  const address = new Address(only(params, 'title detail url'))
+  const params = only(req.body, 'title detail url')
+  const address = new Address(params)
   const site = new Site({grade: req.grade})
   address.user = req.user._id
   address.save((err, address) => {
@@ -37,6 +37,14 @@ exports.moveAddress = function (req, res) {
 
 // 查询收藏
 exports.get = function (req, res) {
-  const params = only(req.body, 'gradeId pageSize index')
+  const params = only(req.query, 'gradeId pageSize index')
+  const page = Number(params.index) || 0
+  const limit = Number(params.pageSize) || 30
+  Site.find({grade: params.gradeId})
+    .select('address').populate('address')
+    .sort({createDate: -1})
+    .limit(limit)
+    .skip(page * limit).then(sites => {
+      res.send({success: true, sites})
+    })
 }
-
