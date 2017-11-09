@@ -38,7 +38,7 @@
     _http('GET', url, data, callback)
   }
 
-  function _http (type, url, data,callback) {
+  function _http (type, url, data, callback) {
     $.ajax({
       type,
       url: url,
@@ -48,10 +48,10 @@
         location.href = '/login.html?returnUrl=' + encodeURIComponent(location.href)
       }
       if (res.success) {
-        if (callback) callback(false, res)
+        if (callback) callback(null, res)
       } else {
         COMMON.alert(res.message)
-        if (callback) callback(true, res)
+        if (callback) callback(new Error(), res)
       }
     })
   }
