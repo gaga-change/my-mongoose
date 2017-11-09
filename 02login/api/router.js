@@ -10,6 +10,9 @@ module.exports = function (app, router) {
   /* 中间件 */
   router.use('/', user.session) // 获取session存储的用户
 
+  /* 中间件 */
+  router.param('gradeId', grade.load)
+
   /* 用户 User */
   router.post('/login', user.login) // 登入接口
   router.post('/register', user.register) // 注册接口
@@ -26,10 +29,10 @@ module.exports = function (app, router) {
   router.put('/grade', login, grade.modify) // 重命名目录
   router.get('/grade', grade.get) // 获取目录列表
 
-  router.post('/collect/address', login, siteAddress.add) // 添加收藏
-  router.delete('/collect/address', login, siteAddress.delete) // 删除收藏
-  router.put('/collect/move', login, siteAddress.moveAddress) // 移动收藏
-  router.get('/collect', siteAddress.get) // 查询收藏
+  router.post('/site/address/:gradeId', login, siteAddress.add) // 添加收藏
+  // router.delete('/collect/:gradeId/address', login, siteAddress.delete) // 删除收藏
+  // router.put('/collect/:gradeId/move', login, siteAddress.moveAddress) // 移动收藏
+  // router.get('/collect/:gradeId', siteAddress.get) // 查询收藏
   // router.post('/collect/address', collectAddress.add) // 添加收藏
   // router.delete('/collect/address', collectAddress.delete) // 添加收藏
   // router.put('/collect/address', collectAddress.put) // 修改收藏

@@ -6,9 +6,13 @@ const Grade = require('../models/grade_schema')
 const only = require('only')
 
 exports.load = function (req, res, next, _id) {
-  Grade.findOne(_id).then(grade => {
-    console.log(grade)
-    next()
+  Grade.findOne({_id}).then(grade => {
+    if (grade) {
+      req.grade = grade
+      next()
+    } else {
+      res.send({success: false, msg: '目录不存在'})
+    }
   })
 }
 
