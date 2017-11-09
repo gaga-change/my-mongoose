@@ -2,16 +2,21 @@
  * Created by yanjd on 2017/10/12.
  */
 const Address = require('../models/address_schema')
+const Site = require('../models/site_schema')
 const only = require('only')
 
 // 添加收藏
 exports.add = function (req, res) {
   const params = only(req.body, 'title detail url gradeId')
-  address = new Address(address)
+  const address = new Address(only(params, 'title detail url'))
+  const site = new Site({grade: params['gradeId']})
   address.user = req.user._id
   address.save((err, address) => {
     if (err) return res.send({success: false, message: err.message})
-    else return res.send({success: true})
+    else {
+
+      return res.send({success: true})
+    }
   })
 }
 

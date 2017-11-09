@@ -5,6 +5,13 @@
 const Grade = require('../models/grade_schema')
 const only = require('only')
 
+exports.load = function (req, res, next, _id) {
+  Grade.findOne(_id).then(grade => {
+    console.log(grade)
+    next()
+  })
+}
+
 /**
  * 增加目录
  *  限制最多20条
