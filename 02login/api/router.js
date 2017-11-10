@@ -30,7 +30,7 @@ module.exports = function (app, router) {
   router.get('/grade', grade.get) // 获取目录列表
 
   router.post('/site/address/:gradeId', login, siteAddress.add) // 添加收藏
-  // router.delete('/collect/:gradeId/address', login, siteAddress.delete) // 删除收藏
+  router.delete('/site/address/:gradeId', login, siteAddress.delete) // 删除收藏
   // router.put('/collect/:gradeId/move', login, siteAddress.moveAddress) // 移动收藏
   router.get('/site/address', siteAddress.get) // 查询收藏
   // router.post('/collect/address', collectAddress.add) // 添加收藏
