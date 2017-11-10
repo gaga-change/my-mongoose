@@ -29,10 +29,12 @@ module.exports = function (app, router) {
   router.put('/grade', login, grade.modify) // 重命名目录
   router.get('/grade', grade.get) // 获取目录列表
 
+  /* 链接收藏操作 */
   router.post('/site/address/:gradeId', login, siteAddress.add) // 添加收藏
   router.delete('/site/address/:gradeId', login, siteAddress.delete) // 删除收藏
   router.put('/site/move/:gradeId', login, siteAddress.moveAddress) // 移动收藏
   router.get('/site/address', siteAddress.get) // 查询收藏
+  router.put('/address', login, siteAddress.modifyAddress) // 修改链接
   // router.post('/collect/address', collectAddress.add) // 添加收藏
   // router.delete('/collect/address', collectAddress.delete) // 添加收藏
   // router.put('/collect/address', collectAddress.put) // 修改收藏

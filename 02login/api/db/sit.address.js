@@ -65,7 +65,7 @@ exports.moveAddress = function (req, res) {
     Grade.findOne({_id: params.oldGrade, user: req.user}).then(grade => {
       if (grade) {
         Site.update({_id: {$in: siteId}, grade: params.oldGrade}, {grade: req.grade}).then(msg => {
-          res.send({msg})
+          res.send({success: true, msg})
         }).catch(err => {
           res.send({err})
         })
@@ -76,6 +76,17 @@ exports.moveAddress = function (req, res) {
       res.send({err})
     })
   }
+}
+
+// 修改链接信息
+exports.modifyAddress = function (req, res) {
+  const params = only(req.body, 'addressId title detail url')
+  if (!params.addressId) return res.send({success: false, message: '参数异常'})
+  Address.update({_id: params.addressId, user: req.user}, {title: params.title, detail: params.detail, url: params.url}).then(msg => {
+    res.send({success: true, msg})
+  }).catch(err => {
+    res.send({err})
+  })
 }
 
 // 查询收藏
