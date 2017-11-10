@@ -7,7 +7,7 @@ const only = require('only')
 
 exports.load = function (req, res, next, _id) {
   Grade.findOne({_id}).then(grade => {
-    if (grade) {
+    if (grade && grade.user._id === req.user._id) { // 只能操作自己的目录
       req.grade = grade
       next()
     } else {
