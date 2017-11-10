@@ -13,6 +13,8 @@ exports.load = function (req, res, next, _id) {
     } else {
       res.send({success: false, msg: '目录不存在'})
     }
+  }).catch(err => {
+    res.send({err})
   })
 }
 

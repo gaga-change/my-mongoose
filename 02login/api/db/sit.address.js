@@ -3,6 +3,7 @@
  */
 const Address = require('../models/address_schema')
 const Site = require('../models/site_schema')
+const Grade = require('../models/grade_schema')
 const only = require('only')
 
 // 添加收藏
@@ -46,13 +47,35 @@ exports.delete = function (req, res) {
           }
         })
       }
+    }).catch(err => {
+      res.send({err})
     })
   }
 }
 
 // 修改收藏（迁移目录）
 exports.moveAddress = function (req, res) {
-  const params = only(req.body, 'addressId siteId')
+  const params = only(req.body, 'siteId oldGrade')
+  let siteId = []
+  if (!params.siteId || !params.oldGrade) return res.send({success: false, message: '参数不能为空'})
+  siteId = params.siteId.split(',')
+  if (params['siteId'].length === 0 || siteId.length === 0 || siteId.length > 10) {
+    res.send({success: false, message: '必须传递siteId值，且只支持最多10条操作'})
+  } else {
+    Grade.findOne({_id: params.oldGrade, user: req.user}).then(grade => {
+      if (grade) {
+        Site.update({_id: {$in: siteId}, grade: params.oldGrade}, {grade: req.grade}).then(msg => {
+          res.send({msg})
+        }).catch(err => {
+          res.send({err})
+        })
+      } else {
+        res.send({success: false, message: '没有权限操作'})
+      }
+    }).catch(err => {
+      res.send({err})
+    })
+  }
 }
 
 // 查询收藏
