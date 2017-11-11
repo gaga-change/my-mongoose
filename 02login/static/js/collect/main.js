@@ -99,6 +99,11 @@
     $(e.target).parent().addClass('active')
     data.gradeCheckIndex = Number($(e.target).attr('data-index'))
   }
+  
+  // 获取链接列表
+  function getAddressList() {
+    
+  }
 
   // ################################### 控制元素 ###################################
 

@@ -22,6 +22,29 @@
     }
   }
 
+  api.siteAddres = {
+    // 添加收藏
+    add: function (gradeId, params, callback) {
+      _post('/api/site/address/' + gradeId, params, callback)
+    },
+    // 删除链接
+    delete: function (gradeId, params, callback) {
+      _del('/api/site/address/' + gradeId, params, callback)
+    },
+    // 修改链接
+    modifyAddress: function (params, callback) {
+      _put('/api/address', params, callback)
+    },
+    // 移动链接
+    moveAddress: function (newGradeId, params, callback) {
+      _put('/api/site/move/' + newGradeId, params, callback)
+    },
+    // 获取列表
+    get: function (params, callback) {
+      _get('/api/site/address', params, callback)
+    }
+  }
+
   function _post (url, data, callback) {
     _http('POST', url, data, callback)
   }
