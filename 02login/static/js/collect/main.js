@@ -28,7 +28,11 @@
   // ################################### 加载完毕 ###################################
 
   $(function () {
-    setGrade()
+    // 获取目录
+    setGrade(function () {
+      // 获取链接
+      getAddressList()
+    })
   })
 
   // ################################### 事件监听 ###################################
@@ -58,11 +62,12 @@
   // ###################################   方法  ###################################
 
   // 配置目录
-  function setGrade() {
+  function setGrade(callback) {
     api.grade.get({}, function (err, res) {
       if (!err) {
         data.grade = res.grade
         changeGrade(data.grade, data.gradeCheckIndex)
+        if (callback) callback()
       }
     })
   }
@@ -120,11 +125,20 @@
   
   // 获取链接列表
   function getAddressList() {
-    
+    api.siteAddres.get({
+      gradeId: data.gradeNow()._id,
+      pageSize: 10,
+      index: 0
+    }, function (err, res) {
+      if (err) {
+        common.alert(res.message)
+      }
+    })
   }
 
   // 添加链接
   function addAddress() {
+    if (!data.gradeNow()) return
     api.siteAddres.add(data.gradeNow()._id, {
       title: data.text.address.title,
       detail: data.text.address.detail,
