@@ -13,6 +13,7 @@
     gradeNow: function () {
       return this.grade[this.gradeCheckIndex]
     }, // 当前选中的目录
+    sites: [], // 链接列表
     text: {
       newGrade: '', // 新增目录名
       modifyGrade: '', // 修改目录名
@@ -135,6 +136,9 @@
     }, function (err, res) {
       if (err) {
         common.alert(res.message)
+      } else {
+        data.sites = res.sites
+        changeAddressList(res.sites)
       }
     })
   }
@@ -170,6 +174,21 @@
       var gradeEle = $(`<li><a href="JavaScript:void(0)" data-index="${index}">${item.name}</a></li>`)
       if (index === Number(checkIndex)) gradeEle.addClass('active')
       $('#menuList').append(gradeEle)
+    })
+  }
+
+  // 链接列表
+  function changeAddressList(sites) {
+    var listGroup = $("#listGroup")
+    listGroup.html('')
+    sites.forEach(function (val, index) {
+      var item = $('<div class="list-group-item" data-site="' + val._id + '" data-address="' + val.address._id +'">\n' +
+        '<a href="#">' +
+        '<h4 class="list-group-item-heading">' + val.address.title + '</h4>\n' +
+        '<p class="list-group-item-text">' + val.address.detail + '</p>\n' +
+        '</a>' +
+        '</div>')
+      listGroup.append(item)
     })
   }
 }($))
