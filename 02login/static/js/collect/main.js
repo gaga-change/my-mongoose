@@ -111,7 +111,7 @@
   }
 
   // 添加链接
-  function addAddress() {
+  function addAddress(e) {
     if (!data.gradeNow()) return
     api.siteAddres.add(data.gradeNow()._id, {
       title: data.text.address.title,
@@ -128,6 +128,8 @@
         data.text.address.title = ''
         data.text.address.detail = ''
         data.text.address.url = ''
+        data.sites.push(res.site)
+        changeAddressList(data.sites)
       }
     })
   }
@@ -147,7 +149,7 @@
       }
     })
   }
-  
+
   // ################################### 控制元素 ###################################
 
   // 目录列表
