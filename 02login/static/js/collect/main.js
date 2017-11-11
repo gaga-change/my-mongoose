@@ -118,9 +118,12 @@
 
   // 改变当前选中菜单
   function changeGradeCheck(e) {
-    $(e.currentTarget).find('li').removeClass('active')
-    $(e.target).parent().addClass('active')
-    data.gradeCheckIndex = Number($(e.target).attr('data-index'))
+    if (data.gradeCheckIndex !== Number($(e.target).attr('data-index'))) {
+      $(e.currentTarget).find('li').removeClass('active')
+      $(e.target).parent().addClass('active')
+      data.gradeCheckIndex = Number($(e.target).attr('data-index'))
+      getAddressList()
+    }
   }
   
   // 获取链接列表
