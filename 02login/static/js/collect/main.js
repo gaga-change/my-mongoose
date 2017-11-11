@@ -165,6 +165,7 @@
   // 链接列表
   function changeAddressList(sites) {
     var listGroup = $("#listGroup")
+    listGroup.show()
     listGroup.html('')
     sites.forEach(function (val, index) {
       var item = $('<div class="list-group-item" data-site="' + val._id + '" data-address="' + val.address._id +'">\n' +
@@ -172,6 +173,9 @@
         '<h4 class="list-group-item-heading">' + val.address.title + '</h4>\n' +
         '<p class="list-group-item-text">' + val.address.detail + '</p>\n' +
         '</a>' +
+        '<span class="other"><button type="button" class="btn btn-warning btn-sm">删除</button>' +
+        '<button type="button" class="btn btn-info btn-sm">共享</button>' +
+        '<a href="#">进入详情</a></span>' +
         '</div>')
       listGroup.append(item)
     })

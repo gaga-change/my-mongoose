@@ -2,3 +2,14 @@
     display: block;
     margin: 2px;
 }
+
+.other {
+    display: none;
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+}
+
+.list-group-item:hover .other {
+    display: block;
+}
