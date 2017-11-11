@@ -16,9 +16,9 @@ exports.add = function (req, res) {
     if (err) res.send({success: false, message: err.message})
     else if (address) {
       site.address = address
-      site.save(err => {
+      site.save((err, site) => {
         if (err) return res.send({success: false, message: err.message})
-        else res.send({success: true})
+        else res.send({success: true, site})
       })
     } else {
       res.send({success: false, message: 'address 保存失败'})
