@@ -175,6 +175,7 @@
         '</a>' +
         '<span class="other"><button type="button" class="btn btn-warning btn-sm">删除</button>' +
         '<button type="button" class="btn btn-info btn-sm">共享</button>' +
+        '<button type="button" class="btn btn-primary btn-sm">移动</button>' +
         '<a href="#">进入详情</a></span>' +
         '</div>')
       listGroup.append(item)
