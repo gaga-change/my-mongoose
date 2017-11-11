@@ -10,9 +10,17 @@
   var data = {
     grade: [], // 目录列表
     gradeCheckIndex: 0, // 当前选中的目录
+    gradeNow: function () {
+      return this.grade[this.gradeCheckIndex]
+    }, // 当前选中的目录
     text: {
       newGrade: '', // 新增目录名
-      modifyGrade: '' // 修改目录名
+      modifyGrade: '', // 修改目录名
+      address: {
+        title: '', // 标题
+        detail: '', // 描述
+        url: '', // 链接地址
+      }
     }
   }
   window.data = data
@@ -29,6 +37,7 @@
   $("#menuList").click(changeGradeCheck) // 改变当前选中菜单
   $("#deleteGradeNameBtn").click(deleteGradeName) // 删除当前目录
   $("#modifyGradeNameBtn").click(modifyGradeName) // 修改当前目录名
+  $("#addAddressBtn").click(addAddress) // 添加链接
 
   $("#addGradeInput").change(function (e) {
     data.text.newGrade = $(e.target).val()
@@ -36,6 +45,15 @@
   $("#newGradeInput").change(function (e) {
     data.text.modifyGrade = $(e.target).val()
   }) // 修改目录输入内容
+  $("#titleInput").change(function (e) {
+    data.text.address.title = $(e.target).val()
+  }) // 链接标题
+  $("#detailInput").change(function (e) {
+    data.text.address.detail = $(e.target).val()
+  }) // 链接描述
+  $("#urlInput").change(function (e) {
+    data.text.address.url = $(e.target).val()
+  }) // 链接地址
 
   // ###################################   方法  ###################################
 
@@ -103,6 +121,27 @@
   // 获取链接列表
   function getAddressList() {
     
+  }
+
+  // 添加链接
+  function addAddress() {
+    api.siteAddres.add(data.gradeNow()._id, {
+      title: data.text.address.title,
+      detail: data.text.address.detail,
+      url: data.text.address.url
+    }, function (err, res) {
+      if (err) {
+        common.alert(res.message)
+      } else {
+        common.alert("添加成功")
+        $("#titleInput").val('')
+        $("#detailInput").val('')
+        $("#urlInput").val('')
+        data.text.address.title = ''
+        data.text.address.detail = ''
+        data.text.address.url = ''
+      }
+    })
   }
 
   // ################################### 控制元素 ###################################
