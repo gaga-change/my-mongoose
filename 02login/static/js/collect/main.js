@@ -45,17 +45,6 @@
 
   // ###################################   方法  ###################################
 
-  // 配置目录
-  function setGrade(callback) {
-    api.grade.get({}, function (err, res) {
-      if (!err) {
-        data.grade = res.grade
-        changeGrade(data.grade, data.gradeCheckIndex)
-        if (callback) callback()
-      }
-    })
-  }
-
   // 添加目录
   function addGrade(e) {
     var name = data.text.newGrade
@@ -100,6 +89,17 @@
     }
   }
 
+  // 配置目录
+  function setGrade(callback) {
+    api.grade.get({}, function (err, res) {
+      if (!err) {
+        data.grade = res.grade
+        changeGrade(data.grade, data.gradeCheckIndex)
+        if (callback) callback()
+      }
+    })
+  }
+
   // 改变当前选中菜单
   function changeGradeCheck(e) {
     if (data.gradeCheckIndex !== Number($(e.target).attr('data-index'))) {
@@ -108,22 +108,6 @@
       data.gradeCheckIndex = Number($(e.target).attr('data-index'))
       getAddressList()
     }
-  }
-  
-  // 获取链接列表
-  function getAddressList() {
-    api.siteAddres.get({
-      gradeId: data.gradeNow()._id,
-      pageSize: 10,
-      index: 0
-    }, function (err, res) {
-      if (err) {
-        common.alert(res.message)
-      } else {
-        data.sites = res.sites
-        changeAddressList(res.sites)
-      }
-    })
   }
 
   // 添加链接
@@ -148,6 +132,22 @@
     })
   }
 
+  // 获取链接列表
+  function getAddressList() {
+    api.siteAddres.get({
+      gradeId: data.gradeNow()._id,
+      pageSize: 10,
+      index: 0
+    }, function (err, res) {
+      if (err) {
+        common.alert(res.message)
+      } else {
+        data.sites = res.sites
+        changeAddressList(res.sites)
+      }
+    })
+  }
+  
   // ################################### 控制元素 ###################################
 
   // 目录列表
