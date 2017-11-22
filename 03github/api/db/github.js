@@ -88,9 +88,9 @@ exports.pushTree = function (req, res) {
               headers: Headers
             }, function (err, response, body) {
               console.log('send success')
+              if (err) return res.send({err, msg: '接口异常'})
               const parse = _parse(body)
-              if (err) res.send({err, msg: '接口异常'})
-              else if (parse.err) {
+              if (parse.err) {
                 res.send({err: parse.err, msg: parse.msg})
               } else {
                 tree = new GitHubTree(parse.obj)
