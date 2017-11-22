@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "mongod": "mongod --config e://data/mongod_config.txt",
-    "mongo-express": "mongo-express -p 1 -u 1 -d session01"
+    "mongo-express": "mongo-express -p 1 -u 1 -d test"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,8 @@
     "express-session": "^1.15.5",
     "mongoose": "^4.11.13",
     "multer": "^1.3.0",
-    "only": "0.0.2"
+    "only": "0.0.2",
+    "request": "^2.83.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
