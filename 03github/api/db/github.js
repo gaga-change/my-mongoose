@@ -44,6 +44,7 @@ exports.pushCommit = function (req, res) {
 
 // 存储目录
 exports.pushTree = function (req, res) {
+  const pushAllTree = !!req.body['pushAllTree'] // 强制更新所有目录
   let TreeChange = [] // 新目录列表
   let FileChange = [] // 新文件的列表
   let Files = [] // 文件
@@ -73,7 +74,13 @@ exports.pushTree = function (req, res) {
         let tree = trees.pop()
         GitHubTree.findOne({sha: tree.sha}, function (err, item) {
           if (err) res.send({err, msg: 'DB异常'})
-          else if (item) _getTree(trees)
+          else if (item){
+            if (pushAllTree) {
+              item.tree.filter(v => v.type === 'tree').forEach(v => trees.push(v))
+              item.tree.filter(v => v.type === 'blob').forEach(v => Files.push(v))
+            }
+            _getTree(trees)
+          }
           else {
             console.log('sending:' + tree.url)
             request.get({
