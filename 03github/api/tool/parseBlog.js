@@ -28,7 +28,9 @@ module.exports = function parseBlog (data) {
     ret.date = new Date(header[5])
     ret.blog = header[7]
     ret.push = header[9] === 'true'
-    let body = arr[2] // 内容
+    arr.shift()
+    arr.shift()
+    let body = arr.join('') // 内容
     ret.imageUrl = body.split('[image]:')[1].trim()
     ret.intro = body.split('\n')[2].split('>')[1].trim()
     ret.content = data
