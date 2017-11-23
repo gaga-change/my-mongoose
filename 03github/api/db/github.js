@@ -44,8 +44,9 @@ exports.pushCommit = async(function * (req, res, next) {
       const commit = new GitHubCommit(_parse(commitApiData.data).obj[0])
       const already = yield GitHubCommit.findOne({sha: commit.sha})
       if (already) { // 如果已经存在
-        res.send({already: true, time: commitApiData.date})
+        res.send({already: true, time: commitApiData.date, commit})
       } else {
+        commit.date = commit.commit.committer.date
         yield commit.save()
         res.send({already: false, time: commitApiData.date})
       }
@@ -109,14 +110,26 @@ exports.pushTree = async(function * (req, res, next) {
  *    - Pop files -> API 获取当前文件内容 -> 存储文件
  *  -> 返回 剩余文件
  */
+exports.test = async(function * (req, res, next) {
+  const already = yield GitHubFile.find({sha: req.body.sha})
+  res.send({already})
+})
+
 exports.pushFile = async(function * (req, res, next) {
   try {
-    const variable = yield Variable.findOne({})
+    const variable = yield Variable.findOne({}).sort({date: -1})
     const files = variable.files
     if (files.length === 0) { // 文件为空，代表所有文件拉取完毕
       return res.send({already: true, variable})
     }
     const file = files.pop()
+    console.log(file)
+    const already = yield GitHubFile.findOne({sha: file.sha}) // 查看是否已存在该目录
+    console.log(already)
+    if (already) {
+      yield variable.save()
+      return res.send({already: true, variable, file: already}) // 如果已拉取过，直接结束  end
+    }
     const fileApiData = yield myRequest({ // GitHub API 请求
       url: file.url,
       headers: Headers
@@ -127,11 +140,11 @@ exports.pushFile = async(function * (req, res, next) {
     } else if (_parse(fileApiData.data).err) { // 解析报错
       res.send({err: _parse(fileApiData.data).err, msg: _parse(fileApiData.data).msg})
     } else {
-      const fileContent = _parse(fileApiData.data).obj // 文件带内容信息
+      let fileContent = _parse(fileApiData.data).obj // 文件带内容信息
       fileContent.path = file.path
       yield new GitHubFile(fileContent).save()
       yield variable.save()
-      res.send({already: false, time: fileApiData.date, variable})
+      res.send({already: false, time: fileApiData.date, variable, fileContent})
     }
   } catch (err) {
     next(err)
