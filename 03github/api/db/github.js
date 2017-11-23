@@ -4,7 +4,9 @@
 
 // const {GitHubCommit} = require('../models/user_schema')
 const {GitHubCommit, GitHubTree, GitHubFile, Variable} = require('../models/github_schema')
+const Article = require('../models/article_schema')
 const myRequest = require('../tool/request')
+const parseBlog = require('../tool/parseBlog')
 const config = require('../../../hide.config.json')
 const co = require('co')
 const async = co.wrap
@@ -115,6 +117,7 @@ exports.test = async(function * (req, res, next) {
   res.send({already})
 })
 
+// 保存文件
 exports.pushFile = async(function * (req, res, next) {
   try {
     const variable = yield Variable.findOne({}).sort({date: -1})
@@ -143,8 +146,11 @@ exports.pushFile = async(function * (req, res, next) {
       let fileContent = _parse(fileApiData.data).obj // 文件带内容信息
       fileContent.path = file.path
       yield new GitHubFile(fileContent).save()
+      let blog = parseBlog(fileContent.content)
+      console.log(blog)
+      if (!blog.err) yield Article.update({blog: blog.blog}, blog, {upsert: true})
       yield variable.save()
-      res.send({already: false, time: fileApiData.date, variable, fileContent})
+      res.send({already: false, time: fileApiData.date, variable, fileContent, blog})
     }
   } catch (err) {
     next(err)
