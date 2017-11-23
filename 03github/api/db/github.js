@@ -3,13 +3,32 @@
  */
 
 // const {GitHubCommit} = require('../models/user_schema')
-const {GitHubCommit, GitHubTree, GitHubFile} = require('../models/github_schema')
+const {GitHubCommit, GitHubTree, GitHubFile, Variable} = require('../models/github_schema')
 const request = require('request')
+const myRequest = require('../tool/request')
 const config = require('../../../hide.config.json')
+const co = require('co')
+const async = co.wrap
+
 const Headers = {
   'User-Agent': 'gaga-change',
   'Authorization': 'token ' + config.github_token
 }
+
+// 判断全局变量是否创建
+co(function * () {
+  try {
+    const glb = yield Variable.findOne({})
+    if (!glb) {
+      yield new Variable({}).save()
+      console.log('初始化变量 创建')
+    } else {
+      console.log('DB全局变量 已创建')
+    }
+  } catch (err) {
+    console.error('DB异常', err)
+  }
+})
 
 // 存储Commit
 exports.pushCommit = function (req, res) {
@@ -42,101 +61,49 @@ exports.pushCommit = function (req, res) {
   })
 }
 
-// 存储目录
-exports.pushTree = function (req, res) {
-  const pushAllTree = !!req.body['pushAllTree'] // 强制更新所有目录
-  let TreeChange = [] // 新目录列表
-  let FileChange = [] // 新文件的列表
-  let Files = [] // 文件
-  GitHubCommit.findOne().sort({date: -1}).exec(function (err, commit) {
-    if (err) return res.send({err, msg: 'DB异常'})
-    if (commit) {
-      if (!commit['commit'] || !commit['commit']['tree']) {
-        res.send({err, msg: '没有commit.tree'})
-      } else {
-        _getTree([commit['commit']['tree']])
-      }
-    } else {
-      res.send({err: true, msg: '无提交日志'})
+// 一次存储一个目录层级
+/**
+ * trees
+ *  - 空 根据Commit 获取第一层级，进入不为空
+ *  - 不为空
+ *    - Pop trees -> API 获取当前目录内容 -> 存储目录、子目录、子文件
+ *  -> 返回 当前目录,未排查目录
+ */
+exports.pushTree = async(function * (req, res, next) {
+  try {
+    const variable = yield Variable.findOne({})
+    const trees = variable.trees
+    if (trees.length === 0) {
+      const commit = yield GitHubCommit.findOne().sort({date: -1})
+      if (!commit) return res.send({err: true, msg: '无提交日志'}) // 如果没有日志，直接结束 end
+      trees.push(commit.commit.tree)
     }
-
-    function _getTree (trees) {
-      if (trees.length === 0) { // 目录为零，遍历结束
-        _saveFile(Files)
-      } else {
-        /**
-         * 判断该目录是否存在
-         *  存在，直接继续调用
-         *  不存在, 获取该目录下 子文件和子目录
-         *    1. 存储
-         *    2. 拉取子目录存放到数组中
-         */
-        let tree = trees.pop()
-        GitHubTree.findOne({sha: tree.sha}, function (err, item) {
-          if (err) res.send({err, msg: 'DB异常'})
-          else if (item){
-            if (pushAllTree) {
-              item.tree.filter(v => v.type === 'tree').forEach(v => trees.push(v))
-              item.tree.filter(v => v.type === 'blob').forEach(v => Files.push(v))
-            }
-            _getTree(trees)
-          }
-          else {
-            console.log('sending:' + tree.url)
-            request.get({
-              url: tree.url,
-              headers: Headers
-            }, function (err, response, body) {
-              console.log('send success')
-              if (err) return res.send({err, msg: '接口异常'})
-              const parse = _parse(body)
-              if (parse.err) {
-                res.send({err: parse.err, msg: parse.msg})
-              } else {
-                tree = new GitHubTree(parse.obj)
-                tree.save(function (err) {
-                  if (err) res.send({err, msg: 'DB异常'})
-                  else {
-                    TreeChange.push(tree)
-                    parse.obj.tree.filter(v => v.type === 'tree').forEach(v => trees.push(v))
-                    parse.obj.tree.filter(v => v.type === 'blob').forEach(v => Files.push(v))
-                    _getTree(trees)
-                  }
-                })
-              }
-            })
-          }
-        })
-      }
+    const tree = trees.pop() // 只包含自身信息，不带子目录和子文件信息
+    const already = yield GitHubTree.findOne({sha: tree.sha}) // 查看是否已存在该目录
+    if (already) {
+      yield variable.save()
+      return res.send({variable, tree: already, already: true}) // 如果已拉取过，直接结束  end
     }
-
-    function _saveFile (files) {
-      if (files.length === 0) {
-        res.send({
-          changeFile: FileChange.length,
-          changeTree: TreeChange.length,
-          FileChange,
-          TreeChange
-        })
-      } else {
-        let file = new GitHubFile(files.pop())
-        GitHubFile.findOne({sha: file.sha}, function (err, item) {
-          if (err) res.send({err, msg: 'DB异常'})
-          else if (item) _saveFile(files)
-          else {
-            file.save(err => {
-              if (err) res.send({err, msg: 'DB异常'})
-              else {
-                FileChange.push(file)
-                _saveFile(files)
-              }
-            })
-          }
-        })
-      }
+    const treeApiData = yield myRequest({ // GitHub API 请求
+      url: tree.url,
+      headers: Headers
+    })
+    if (treeApiData.err) { // 请求报错
+      res.send({err: treeApiData.err, time: treeApiData.date})
+    } else if (_parse(treeApiData.data).err) { // 解析报错
+      res.send({err: _parse(treeApiData.data).err, msg: _parse(treeApiData.data).msg})
+    } else { // 数据正常
+      let treeSonList = _parse(treeApiData.data).obj // 目录下的子文件和子目录
+      treeSonList.path = tree.path || '主目录'
+      yield new GitHubTree(treeSonList).save()
+      treeSonList.tree.filter(v => v.type === 'tree').forEach(v => trees.push(v))
+      yield variable.save()
+      res.send({ variable, tree: treeSonList, already: false, github_api_time: treeApiData.date })
     }
-  })
-}
+  } catch (err) {
+    next(err)
+  }
+})
 
 // 拉取所有文件的内容
 exports.pushFile = function (req, res) {
