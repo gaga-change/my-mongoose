@@ -31,35 +31,30 @@ co(function * () {
 })
 
 // 存储Commit
-exports.pushCommit = function (req, res) {
-  request.get({
-    url: 'https://api.github.com/repos/gaga-change/test/commits?page=1&per_page=1',
-    headers: Headers
-  }, function (err, response, body) {
-    if (err) return res.send({err, msg: '接口异常'})
-    const parse = _parse(body)
-    if (parse.err) {
-      res.send({err: parse.err, msg: parse.msg})
+exports.pushCommit = async(function * (req, res, next) {
+  try {
+    const commitApiData = yield myRequest({ // GitHub API 请求
+      url: 'https://api.github.com/repos/gaga-change/test/commits?page=1&per_page=1',
+      headers: Headers
+    })
+    if (commitApiData.err) { // 请求报错
+      res.send({err: commitApiData.err, time: commitApiData.date})
+    } else if (_parse(commitApiData.data).err) { // 解析报错
+      res.send({err: _parse(commitApiData.data).err, msg: _parse(commitApiData.data).msg})
     } else {
-      const commit = new GitHubCommit(parse.obj[0])
-      if (!commit['commit'] || !commit['commit']['committer'] || !commit['commit']['committer']['date']) {
-        return res.send({err, msg: '没有commit.committer.date'})
+      const commit = new GitHubCommit(_parse(commitApiData.data).obj[0])
+      const already = yield GitHubCommit.findOne({sha: commit.sha})
+      if (already) { // 如果已经存在
+        res.send({already: true, time: commitApiData.date})
+      } else {
+        yield commit.save()
+        res.send({already: false, time: commitApiData.date})
       }
-      commit.date = new Date(commit['commit']['committer']['date'])
-      GitHubCommit.findOne({sha: commit.sha}, function (err, item) {
-        if (err) return res.send({err, msg: 'DB异常'})
-        if (item) {
-          res.send({new: false})
-        } else {
-          commit.save(function (err) {
-            if (err) return res.send({err, msg: 'DB异常'})
-            res.send({new: true, headers: response.headers})
-          })
-        }
-      })
     }
-  })
-}
+  } catch (err) {
+    next(err)
+  }
+})
 
 // 一次存储一个目录层级
 /**
@@ -82,7 +77,7 @@ exports.pushTree = async(function * (req, res, next) {
     const already = yield GitHubTree.findOne({sha: tree.sha}) // 查看是否已存在该目录
     if (already) {
       yield variable.save()
-      return res.send({variable, tree: already, already: true}) // 如果已拉取过，直接结束  end
+      return res.send({already: true, variable, tree: already}) // 如果已拉取过，直接结束  end
     }
     const treeApiData = yield myRequest({ // GitHub API 请求
       url: tree.url,
@@ -98,7 +93,7 @@ exports.pushTree = async(function * (req, res, next) {
       yield new GitHubTree(treeSonList).save()
       treeSonList.tree.filter(v => v.type === 'tree').forEach(v => trees.push(v))
       yield variable.save()
-      res.send({ variable, tree: treeSonList, already: false, github_api_time: treeApiData.date })
+      res.send({already: false, time: treeApiData.date, variable, tree: treeSonList})
     }
   } catch (err) {
     next(err)
