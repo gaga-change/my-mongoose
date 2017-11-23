@@ -29,10 +29,10 @@ module.exports.GitHubFile = mongoose.model('GitHubFile', new Schema({
   sha: {type: String},
   path: {type: String},
   size: {type: Number},
-  tree: {type: Array},
   content: {type: String}
 }))
 
 module.exports.Variable = mongoose.model('Variable', new Schema({
-  trees: {type: Array, default: []}
+  trees: {type: Array, default: []},
+  files: {type: Array, default: []}
 }))

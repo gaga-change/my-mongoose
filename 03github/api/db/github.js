@@ -4,7 +4,6 @@
 
 // const {GitHubCommit} = require('../models/user_schema')
 const {GitHubCommit, GitHubTree, GitHubFile, Variable} = require('../models/github_schema')
-const request = require('request')
 const myRequest = require('../tool/request')
 const config = require('../../../hide.config.json')
 const co = require('co')
@@ -84,6 +83,7 @@ exports.pushTree = async(function * (req, res, next) {
       headers: Headers
     })
     if (treeApiData.err) { // 请求报错
+      trees.push(tree) // 没有成功，填回去
       res.send({err: treeApiData.err, time: treeApiData.date})
     } else if (_parse(treeApiData.data).err) { // 解析报错
       res.send({err: _parse(treeApiData.data).err, msg: _parse(treeApiData.data).msg})
@@ -92,6 +92,7 @@ exports.pushTree = async(function * (req, res, next) {
       treeSonList.path = tree.path || '主目录'
       yield new GitHubTree(treeSonList).save()
       treeSonList.tree.filter(v => v.type === 'tree').forEach(v => trees.push(v))
+      treeSonList.tree.filter(v => v.type === 'blob').forEach(v => variable.files.push(v))
       yield variable.save()
       res.send({already: false, time: treeApiData.date, variable, tree: treeSonList})
     }
@@ -101,9 +102,41 @@ exports.pushTree = async(function * (req, res, next) {
 })
 
 // 拉取所有文件的内容
-exports.pushFile = function (req, res) {
-
-}
+/**
+ * files
+ *  - 空 获取完毕，结束
+ *  - 不为空
+ *    - Pop files -> API 获取当前文件内容 -> 存储文件
+ *  -> 返回 剩余文件
+ */
+exports.pushFile = async(function * (req, res, next) {
+  try {
+    const variable = yield Variable.findOne({})
+    const files = variable.files
+    if (files.length === 0) { // 文件为空，代表所有文件拉取完毕
+      return res.send({already: true, variable})
+    }
+    const file = files.pop()
+    const fileApiData = yield myRequest({ // GitHub API 请求
+      url: file.url,
+      headers: Headers
+    })
+    if (fileApiData.err) { // 请求报错
+      files.push(file) // 填回
+      res.send({err: fileApiData.err, time: fileApiData.date})
+    } else if (_parse(fileApiData.data).err) { // 解析报错
+      res.send({err: _parse(fileApiData.data).err, msg: _parse(fileApiData.data).msg})
+    } else {
+      const fileContent = _parse(fileApiData.data).obj // 文件带内容信息
+      fileContent.path = file.path
+      yield new GitHubFile(fileContent).save()
+      yield variable.save()
+      res.send({already: false, time: fileApiData.date, variable})
+    }
+  } catch (err) {
+    next(err)
+  }
+})
 
 function _parse (str) {
   try {
