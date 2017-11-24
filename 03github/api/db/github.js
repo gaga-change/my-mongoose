@@ -3,10 +3,11 @@
  */
 
 // const {GitHubCommit} = require('../models/user_schema')
-const {GitHubCommit, GitHubTree, GitHubFile, Variable} = require('../models/github_schema')
+const {GitHubCommit, GitHubTree, GitHubFile, Variable, Other} = require('../models/github_schema')
 const Article = require('../models/article_schema')
 const myRequest = require('../tool/request')
 const parseBlog = require('../tool/parseBlog')
+const parseReadme = require('../tool/parseReadme')
 const config = require('../../../hide.config.json')
 const co = require('co')
 const async = co.wrap
@@ -104,14 +105,7 @@ exports.pushTree = async(function * (req, res, next) {
   }
 })
 
-// 拉取所有文件的内容
-/**
- * files
- *  - 空 获取完毕，结束
- *  - 不为空
- *    - Pop files -> API 获取当前文件内容 -> 存储文件
- *  -> 返回 剩余文件
- */
+// 测试接口
 exports.test = async(function * (req, res, next) {
   const already = yield GitHubFile.find({sha: req.body.sha})
   res.send({already})
@@ -152,6 +146,27 @@ exports.pushFile = async(function * (req, res, next) {
       yield variable.save()
       res.send({already: false, time: fileApiData.date, variable, fileContent, blog})
     }
+  } catch (err) {
+    next(err)
+  }
+})
+
+// 拉取“关于我”
+exports.parseReadme = async(function * (req, res, next) {
+  try {
+    const commit = yield GitHubCommit.findOne().sort({date: -1})
+    if (!commit) return res.send({err: true, msg: '无提交日志'}) // 如果没有日志，直接结束 end
+    const tree = yield GitHubTree.findOne({sha: commit.commit.tree.sha}).select('tree tree.path tree.sha')
+    if (!tree) return res.send({err: true, msg: '无主目录'})
+    let readme = tree.tree.filter(v => v.path === 'README.md')[0]
+    if (!readme) return res.send({err: true, msg: '目录无README.md 文件'})
+    readme = yield GitHubFile.findOne({sha: readme.sha})
+    if (!readme) return res.send({err: true, msg: 'DB无README.md 文件内容'})
+    const parse = parseReadme(readme.content)
+    if (parse.err) return res.send({err: parse.err, msg: '解析失败'})
+    parse.type = 'about'
+    let about = yield new Other(parse).save()
+    res.send({about})
   } catch (err) {
     next(err)
   }

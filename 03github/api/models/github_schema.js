@@ -32,6 +32,8 @@ module.exports.GitHubFile = mongoose.model('GitHubFile', new Schema({
   content: {type: String}
 }))
 
+module.exports.Other = mongoose.model('Other', new Schema({}, {strict: false}))
+
 module.exports.Variable = mongoose.model('Variable', new Schema({
   trees: {type: Array, default: []},
   files: {type: Array, default: []}
